@@ -1,7 +1,7 @@
 # **Advanced Lane Lines Detection Project**
 ## Writeup / README
 
-This is a summary of the work done to develop a processing pipeline for the advanced lane lines detection project for the Udacity Self-Driving Car Nanodegree. The github repositroy of the project can be found [here] (https://github.com/bmalnar/AdvancedLaneLinesDetectionSDCN)
+This is a summary of the work done to develop a processing pipeline for the advanced lane lines detection project for the Udacity Self-Driving Car Nanodegree. The github repositroy of the project can be found [here](https://github.com/bmalnar/AdvancedLaneLinesDetectionSDCN)
 
 The steps described in the following text include:
 
@@ -31,14 +31,47 @@ By running the command `cv2.undistort` to undistort the image, we get:
 
 <img src="output_images/calibration_5_calibrated.jpg" width="480" alt="Undistorted image" />
 
+### Development of image processing pipeline
 
+In this section, the idea behind the image processing pipeline will described, together with the various steps to achieve the goal of drawing a green zone in the original image, between the detected lane lines. 
 
-### Pipeline (single images)
+The pipeline is largely based on the Sobel operator for detecting edges in the image. We can apply the Sobel operator separately on both x and y directions of the image, and then from the values of these operations we can calculate the overall magnitude of the gradient and the direction of the gradient. The idea is to use some combination of these gradients (only x, or combined x and y, or x gradient combined with the direction gradient, etc.) to come up with the pixels that represent the lane lines. Another area of investigation is whether to use Sobel on RGB images or HLS images. 
 
-#### 1. Provide an example of a distortion-corrected image.
+#### Test image
 
-To demonstrate this step, I will describe how I apply the distortion correction to one of the test images like this one:
-![alt text][image2]
+To validate the pipeline,w e use one of the images provided in the `test_images` directory, for example `test2.jpg`:
+
+<img src="test_images/test2.jpg" width="480" alt="Test image" />
+
+#### Sobel x and y gradients
+
+In the notebook, there is a function called `abs_sobel_thresh`, which calculates the Sobel gradient either in x or in y direction. It firsts converts the image to grayscale, and then runs the function `cv2.Sobel`, where the kernel size can be specified as a function input. We get the following results. 
+
+X gradient: 
+
+<img src="output_images/test_gradx.jpg" width="480" alt="x gradient image" />
+
+Y gradient: 
+
+<img src="output_images/test_grady.jpg" width="480" alt="x gradient image" />
+
+We can see that we slightly prefer the x gradient for lanes detection, because even though both images show the lines detected, the y gradient has more "noise", i.e. more detections that we don't care about.   
+
+#### Sobel magnitude and direction of the gradient
+
+If we combine x and y gradients, we can calculate the overall magnitude of the gradient and its direction, which can help us filter out only the pixels that belong to lane lines. 
+
+We calculate the magnitude of the gradient with the function `mag_thresh`, which calculates x and y gradients and then returns the square root of the sum of their squares. We threshold the output to create the binary version that we want, as shown in the following picture:
+
+<img src="output_images/test_grad_mag.jpg" width="480" alt="x gradient image" />
+
+We calculate the direction of the gradient by calculating arctan of the ratio of `abs(grad_y)/abs(grad_x)`. The resulting gradient is between 0 and pi, but we can filter a sub-section of that (e.g. between 0.7 and 1.3) to detect the lanes. The result is shown in the following picture:
+
+<img src="output_images/test_grad_dir.jpg" width="480" alt="x gradient image" />
+
+If we combine the magnitude and the direction of the gradient, we essentially get the pixels that have a certain magnitude and at the same time a certain direction, which helps to detect the lanes by ignoring the pixels that either have a magnitude which is to low, or the have a direction that we are not interested in. The following picture shows the result of that combination, and we can see that we get a similar image as with the gradient magnitude, but the lines that are for example horizontal are thrown away. 
+
+<img src="output_images/test_grad_mag_dir.jpg" width="480" alt="x gradient image" />
 
 #### 2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
 
