@@ -133,62 +133,41 @@ At this point, we can transform the original and the binary images to the top-do
 
 <img src="output_images/test_binary_warped.jpg" width="480" alt="Test image" />
 
-The code for my perspective transform includes a function called `warper()`, which appears in lines 1 through 8 in the file `example.py` (output_images/examples/example.py) (or, for example, in the 3rd code cell of the IPython notebook).  The `warper()` function takes as inputs an image (`img`), as well as source (`src`) and destination (`dst`) points.  I chose the hardcode the source and destination points in the following manner:
+#### Fit polynomials onto lane line pixels
 
-```python
-src = np.float32(
-    [[(img_size[0] / 2) - 55, img_size[1] / 2 + 100],
-    [((img_size[0] / 6) - 10), img_size[1]],
-    [(img_size[0] * 5 / 6) + 60, img_size[1]],
-    [(img_size[0] / 2 + 55), img_size[1] / 2 + 100]])
-dst = np.float32(
-    [[(img_size[0] / 4), 0],
-    [(img_size[0] / 4), img_size[1]],
-    [(img_size[0] * 3 / 4), img_size[1]],
-    [(img_size[0] * 3 / 4), 0]])
-```
+The next step is to fit polynomials onto the lane lines, so that we can draw the green zone between them. To identify the lane line locations, we use the convolution approach in the function `get_lane_points_and_windows` in the notebook. This function does the following steps:
 
-This resulted in the following source and destination points:
+1) Divide the image horizontally in 9 layers of the same hight
+2) For each of these layers, apply convolution with a smaller window of the same height and get the convolution signal
+3) Get the maximum of the signals for left and right side of the image, i.e. for the left and right lane lines
+4) Check the location of the window and the number of pixels in it. If the number of pixels is low, assume it's not a lane line, and discard the window. If the window is not in the left third (for the left lane line) or in the right third (for the right lane line) of the image, discard the window. 
 
-| Source        | Destination   | 
-|:-------------:|:-------------:| 
-| 585, 460      | 320, 0        | 
-| 203, 720      | 320, 720      |
-| 1127, 720     | 960, 720      |
-| 695, 460      | 960, 0        |
+At this point, we have a binary image with the detected windows drawn on top of it:
 
-I verified that my perspective transform was working as expected by drawing the `src` and `dst` points onto a test image and its warped counterpart to verify that the lines appear parallel in the warped image.
+<img src="output_images/test_binary_warped_win.jpg" width="480" alt="Windows image" />
 
-![alt text][image4]
+Finally using these windows we can fit the polynomials using the numpy method `np.polyfit` inside the function `fit_poly` from the notebook. We get the following zone in this example:
 
-#### 4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
+<img src="output_images/test_zone.jpg" width="480" alt="Zone image" />
 
-Then I did some other stuff and fit my lane lines with a 2nd order polynomial kinda like this:
+The zone can be drawn on top of the original warped image:
 
-![alt text][image5]
+<img src="output_images/test_zone_combined.jpg" width="480" alt="Zone combined image" />
+
+Finally, we transform perspective once more using the inverse matrix _M_inv_ to get the final image:
+
+<img src="output_images/test_orig_detected.jpg" width="480" alt="Final image" />
 
 #### 5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
 
 I did this in lines # through # in my code in `my_other_file.py`
 
-#### 6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
-
-I implemented this step in lines # through # in my code in `yet_another_file.py` in the function `map_lane()`.  Here is an example of my result on a test image:
-
-![alt text][image6]
-
----
-
 ### Pipeline (video)
 
-#### 1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (wobbly lines are ok but no catastrophic failures that would cause the car to drive off the road!).
+To create the video, the entire project video was dumped to a directory called `frames`. This is not included in the repo, but it can be recreated by running the function `video_to_frames` in the notebook. To create the video, each image from the `frames` directory is processed using the function in the notebook called `pipeline_final`, and stored to the output directory. This directory is also not included in the repo, but it can be recreated by running the corresponding cell in the notebook. Finally, we use the moviepy editor to create the video out of the processed frames. The resulting video is in the file `project_video_output.mp4`, which is generated from the video `project_video.mp4`
 
-Here's a [link to my video result](./project_video.mp4)
-
----
+It is important to note that we use a method **fit_poly_past** instead of fit_poly when we create the video. The difference is that the former uses polynomials from a number of previous frames, and averages them to get the resulting fit for the current frame. The video uploaded to this repository was generated by using 9 previous frames. By taking previous frames into account, we ensure that the resulting polynomials are smoother compared to using only single frames. In a single frame, it can happen that the pipeline cannot fit a polynomial reasonable well, so the previous values help get a better picture. 
 
 ### Discussion
 
-#### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
-
-Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.  
+The resulting video shows that the pipeline works with the reasonable quality on the project video. However, it should be further tested for videos that are more challenging, such as more shadows, darkness, incomplete lane lines, merging lanes, etc. This is for the time being outside of the scope of this project. 
