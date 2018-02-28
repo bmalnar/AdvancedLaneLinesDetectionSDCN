@@ -166,7 +166,7 @@ To understand the algorithm behind this function, please consult the notebook. M
 
 The lane lines corresponding to the image above have the curvature of 402m on the left and 446m on the right. 
 
-<img src="output_images/curvature.png" width="480" alt="Final image" />
+<img src="output_images/curvature.png" width="480" alt="Curvature image" />
 
 ### Pipeline (video)
 
