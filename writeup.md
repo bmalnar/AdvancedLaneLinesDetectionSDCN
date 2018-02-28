@@ -73,11 +73,55 @@ If we combine the magnitude and the direction of the gradient, we essentially ge
 
 <img src="output_images/test_grad_mag_dir.jpg" width="480" alt="x gradient image" />
 
-#### 2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
+#### Color space
 
-I used a combination of color and gradient thresholds to generate a binary image (thresholding steps at lines # through # in `another_file.py`).  Here's an example of my output for this step.  (note: this is not actually from one of the test images)
+We investigated the RGB and HLS color spaces for the pipeline, as well as the grayscale. For that purpose, there are several functions in the notebook to easily transform the input image into these various formats and channels, e.g. `get_rgb_binary, get_rgb, get_hls_binary, get_hls, get_gray_binary`. As described in the Udacity course material and as shown by various experiments, the HLS color space seems to be the most adequate for the purpose of lane detection, because it is the most robust one in terms of shades, light intensity etc. For example, with the grayscale format sometimes that yellow lane line completely blands with the gray asphalt and cannot be recognized. 
 
-![alt text][image3]
+The following figures show how we transform the image to R, G, B, H, L, and S binary representation. In this particular case, the differences are not intuitive enough to show that one format is better than the other, but the experiments have shown that H and L binaries provide the most robust solution and are therefore used in the pipeline. 
+
+R binary:
+
+<img src="output_images/test_r_binary.jpg" width="480" alt="r_binary" />
+
+G binary:
+
+<img src="output_images/test_g_binary.jpg" width="480" alt="g_binary" />
+
+B binary:
+
+<img src="output_images/test_b_binary.jpg" width="480" alt="b_binary" />
+
+H binary:
+
+<img src="output_images/test_h_binary.jpg" width="480" alt="h_binary" />
+
+L binary:
+
+<img src="output_images/test_l_binary.jpg" width="480" alt="l_binary" />
+
+S binary:
+
+<img src="output_images/test_s_binary.jpg" width="480" alt="s_binary" />
+
+#### Edge detection pipeline
+
+Based on the methods above to calculate the magnitude and the direction of the gradient using the Sobel operator, and based on different color spaces and channels, we developed the following set of functions to detect the lane lines. The function `pipeline` is implemented in the notebook implements these processing steps:
+
+1) Convert the input image to the HLS color space and get the L and S channels
+2) Calculate the gradient in x direction on both L and S channels
+3) Using the S channel, calculate the direction of the gradient
+4) Calculate the thresholded values of the S channel
+4) Combine the x gradient of L and S with the direction of the gradient and with the thresholded S channel to get the final result (see the function in the notebook for more details)
+
+Using this method on the following picture:
+
+<img src="test_images/test2.jpg" width="480" alt="Test image" />
+
+we obtain the following result:
+
+<img src="output_images/test_2_processed.jpg" width="480" alt="Test image" />
+
+Through all the frames of the project video, this method has proven to be stable and generates good results. 
 
 #### 3. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
 
