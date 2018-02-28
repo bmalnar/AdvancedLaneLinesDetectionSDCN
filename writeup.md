@@ -158,9 +158,15 @@ Finally, we transform perspective once more using the inverse matrix _M_inv_ to 
 
 <img src="output_images/test_orig_detected.jpg" width="480" alt="Final image" />
 
-#### 5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
+#### Calculate the curvature of the lane lines
 
-I did this in lines # through # in my code in `my_other_file.py`
+To calculate the curvature of the lane lines, we use the function `get_curvature` from the notebook. This function uses the same polynomials that are drawn on the input image, and from there it calculates the radius of the curvatore at the bottom of the image, i.e. closest to the vehicle. 
+
+To understand the algorithm behind this function, please consult the notebook. More information on calculating the radius of the curvature for any function can be found [here](https://www.intmath.com/applications-differentiation/8-radius-curvature.php)
+
+The lane lines corresponding to the image above have the curvature of 402m on the left and 446m on the right. 
+
+<img src="output_images/curvature.png" width="480" alt="Final image" />
 
 ### Pipeline (video)
 
