@@ -121,9 +121,17 @@ we obtain the following result:
 
 <img src="output_images/test_2_processed.jpg" width="480" alt="Test image" />
 
-Through all the frames of the project video, this method has proven to be stable and generates good results. 
+The last image is what we refer to as the *binary image* in the further text. Through all the frames of the project video, this method has proven to be stable and generates good results. 
 
-#### 3. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
+#### Perspective transform
+
+After detecting the pixels belonging to the lane lines, we need to transform the image to a different perspective, i.e. so that we view the road top-down. We do this by specifying the points in the image that we want to transform, and their desired destination points, denoted in the notebook as _src_ and _dst_, respectively. We then use the OpenCV function `cv2.getPerspectiveTransform` to calculate the transform matrix and its inverse (_M_ and _M_inv_, respectively), which we can use to transform the original image to the top-down (using _M_) view and vice versa (using _M_inv_). 
+
+At this point, we can transform the original and the binary images to the top-down view. The following two images show the results of these operations:
+
+<img src="output_images/test_orig_warped.jpg" width="480" alt="Test image" />
+
+<img src="output_images/test_binary_warped.jpg" width="480" alt="Test image" />
 
 The code for my perspective transform includes a function called `warper()`, which appears in lines 1 through 8 in the file `example.py` (output_images/examples/example.py) (or, for example, in the 3rd code cell of the IPython notebook).  The `warper()` function takes as inputs an image (`img`), as well as source (`src`) and destination (`dst`) points.  I chose the hardcode the source and destination points in the following manner:
 
