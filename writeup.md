@@ -178,4 +178,9 @@ It is important to note that we use a method **fit_poly_past** instead of fit_po
 
 ### Discussion
 
-The resulting video shows that the pipeline works with the reasonable quality on the project video. However, it should be further tested for videos that are more challenging, such as more shadows, darkness, incomplete lane lines, merging lanes, etc. This is for the time being outside of the scope of this project. 
+The resulting video shows that the pipeline works with the reasonable quality on the project video. However, it should be further tested for videos that are more challenging, such as more shadows, darkness, incomplete lane lines, merging lanes, etc. Finetuning the pipeline to work on more challenging videos is for now outside of the scope of the project, but we can use the video provided as an extra challenge to estimate where the pipeline currently breaks.
+
+The more challenging video provided as the input to the project is called `challenge_video.mp4`, and we generated the video called `challenge_video_output.mp4` as the result of the pipeline processing. The following limitations of the pipeline can be observed:
+
+* The vehicle in the challenging video is driving very close to the left wall, and the shadow of the wall is perceived as a lane line, at least partially. That is why the left line is skewed towards the left incorrectly. This can be addressed by more carefully defining the source points for the perspective transofrmation, and maybe by looking at different channels in the image processing part of the pipeline. 
+* The algorithm appears to be confused by other lines in the images that are not lane lines, which can be seen at the beginning of the video on the right lane line. This again can be improved by looking at different channels of the image and being more careful when selecting source points for the perspective transform. 
