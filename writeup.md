@@ -158,9 +158,11 @@ Finally, we transform perspective once more using the inverse matrix _M_inv_ to 
 
 <img src="output_images/test_orig_detected.jpg" width="480" alt="Final image" />
 
+This image also contains text in the upper left corner, which reports the calculated offset of the vehicle from the center of the road (i.e. the midpoint between the lane lines), in meters, as well as the calculated curvature of the road (note: when the road is straight, this will be a large number). The following section describes how these values were calculated. 
+
 #### Calculate the curvature of the lane lines
 
-To calculate the curvature of the lane lines, we use the function `get_curvature` from the notebook. This function uses the same polynomials that are drawn on the input image, and from there it calculates the radius of the curvatore at the bottom of the image, i.e. closest to the vehicle. 
+To calculate the curvature of the lane lines and the position of the vehicle within the lane, we use the function `get_curvature_and_vehicle_position` from the notebook. This function uses the same polynomials that are drawn on the input image, and from there it calculates the radius of the curvature at the bottom of the image, i.e. closest to the vehicle, and the distance of the camera (i.e. the vehicle) from the midpoint between the two lane lines. 
 
 To understand the algorithm behind this function, please consult the notebook. More information on calculating the radius of the curvature for any function can be found [here](https://www.intmath.com/applications-differentiation/8-radius-curvature.php)
 
